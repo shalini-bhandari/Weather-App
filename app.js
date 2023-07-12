@@ -1,49 +1,43 @@
-const express = require("express");
-const https = require("https");
+const apiKey = "795aae9c46c88e3343df1f3edf28123e";
+    const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+    
+    const searchBox = document.querySelector(".search input");
+    const searchBtn = document.querySelector(".search button");
+    const weatherIcon = document.querySelector(".weatherIcon");
+    //const icon = data.weather[0].description;
+    
+    async function checkWeather(cityName){
+        const response = await fetch(apiUrl + cityName +  `&appid=${apiKey}` );
+        var data = await response.json();
+        console.log(data);
 
-//body-parser is used to parse a string based...
-//client request
-const bodyParser = require("body-parser");
+        document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
+        document.querySelector(".cityName").innerHTML = data.name;
+        document.querySelector(".humidity").innerHTML = data.main.humidity +"%";
+        document.querySelector(".wind").innerHTML = data.wind.speed + " km/h";
+    //     const imageURL = "https://openweathermap.org/img/wn/" + icon +"@2x.png"
+    //    // res.write("<img src=" +imageURL +">");
+    //     document.getElementsByClassName(".weatherIcon").src = imageURL;
+        if(data.weather[0].main == "Clouds"){
+            weatherIcon.src = "images/clouds.png";
+        }
+        else if(data.weather[0].main == "Clear"){
+            weatherIcon.src = "images/clear.png";
+        }
+        else if(data.weather[0].main == "Rain"){
+            weatherIcon.src = "images/rain.png";
+        }
+        else if(data.weather[0].main == "Drizzle"){
+            weatherIcon.src = "images/drizzle.png";
+        }
+        else if(data.weather[0].main == "Mist"){
+            weatherIcon.src = "images/mist.png";
+        }
+    
+    
+    }
 
-
-const app = express();
-
-app.use(bodyParser.urlencoded({extended:true}));
-
-app.get("/", function(req, res){
-
-    res.sendFile(__dirname + "/index.html");
-
-})
-
-app.post("/", function(req, res){
-
-    const query = req.body.cityName;
-    const appid = "795aae9c46c88e3343df1f3edf28123e";
-    const units = "metric";
-    const url = "https://api.openweathermap.org/data/2.5/weather?q="+ query +"&appid=" + appid +"&units=" + units;
-    https.get(url, function(response){
-        console.log(response.statusCode);
-
-        response.on("data", function(data){
-            const weatherData = JSON.parse(data);
-            const temp = weatherData.main.temp;
-            const desc = weatherData.weather[0].description;
-            const icon = weatherData.weather[0].icon;
-            const imageURL = "https://openweathermap.org/img/wn/" + icon +"@2x.png"
-
-            
-            res.write("<h1>The temperature in " + query +" is " + temp + " degress celcius.</h1>");
-            res.write("<p>The weather is currently " + desc+ "<p>");
-            res.write("<img src=" +imageURL +">");
-            res.send();
-        });
-    });
-});
-
-
-
-//setting up of server
-app.listen(3000, function(){
-    console.log("Port 3000 is listening");
-})
+    searchBtn.addEventListener("click", ()=>{
+        checkWeather(searchBox.value);
+    })
+    
